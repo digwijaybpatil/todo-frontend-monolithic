@@ -7,6 +7,15 @@
      ```bash
      curl -s https://deb.nodesource.com/setup_16.x | sudo bash
      sudo apt install nodejs -y
+
+     node -v
+     npm -v
+
+     sudo apt update
+     sudo apt install nginx -y
+     sudo systemctl enable nginx
+     sudo systemctl start nginx
+
      ```
 
 ### Configuration ⚙️
@@ -70,10 +79,10 @@ Open the `src/TodoApp.js` file in your frontend project.
 Update the Backend URL by replacing the existing line with the following:
 
 ```javascript
-const API_BASE_URL = 'http://<FrontendVM Public IP>:80/api';
+const API_BASE_URL = 'http://<BackendVM Public IP>:8000';
 ```
 
-Replace `<FrontendVM Public IP>` with the actual Public IP address of your Frontend VM.
+Replace `<backendVM Public IP>` with the actual Public IP address of your Frontend VM.
 
 ## Important Note 📌
 
