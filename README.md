@@ -87,7 +87,7 @@
 
     # Proxy /api/ requests to backend private IP
     location /api/ {
-        proxy_pass http://10.10.2.4:8000/; #Replace with your backend URL
+        proxy_pass http://10.10.2.4:8000; #Replace with your backend URL
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
     }
