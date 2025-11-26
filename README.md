@@ -39,7 +39,8 @@
    - Update the Backend URL by replacing the existing line with the following:
 
    ```javascript
-   const API_BASE_URL = 'http://<BackendVM private IP>:8000'; # const API_BASE_URL = 'http://10.10.2.4:8000';
+   const API_BASE_URL = 'http://<BackendVM private IP>:8000'; 
+   
    ```
 
    - Replace `<backendVM private IP>` with the actual private IP address of your Backend VM.
@@ -105,49 +106,51 @@
 5. **🔧 CI/CD – GitHub Actions Pipeline (Frontend Deployment to Azure VM)**
 
    Create this file in your repo:
-   ```bash
+```bash
    .github/workflows/deploy-frontend.yml
-   ```
+```
    Paste the following ready-to-use pipeline:
-   ```yml
-   name: Deploy Frontend to Azure VM
+```yml
+name: Deploy Frontend to Azure VM
 
-   on:
-      push:
-         branches:
-         - main
+on:
+  push:
+    branches:
+      - main
 
-   jobs:
-      deploy:
-         runs-on: ubuntu-latest
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
 
-         steps:
-         - name: Checkout Code
-           uses: actions/checkout@v3
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-         - name: Setup Node
-           uses: actions/setup-node@v3
-           with:
-            node-version: "16"
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
 
-         - name: Install Dependencies
-           run: npm install
+      # ✅ Install dependencies — REQUIRED
+      - name: Install Dependencies
+        run: npm install
 
-         - name: Build Frontend
-           run: npm run build
+      - name: Build Frontend
+        run: npm run build
 
-         # Copy only build CONTENTS into /var/www/html
-         - name: Copy Build Contents to VM
-           uses: appleboy/scp-action@v0.1.7
-           with:
-            host: ${{ secrets.SSH_HOST }}       # Frontend VM Public IP
-            username: ${{ secrets.SSH_USER }}   # e.g., adminuser
-            key: ${{ secrets.SSH_KEY }}         # SSH private key (PEM)
-            port: 22
-            source: "build/*"
-            target: "/var/www/html/"
+      # 🔥 Copy ONLY build folder CONTENTS into /var/www/html/
+      - name: Copy Build Contents to VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          source: "build/**"
+          target: "/var/www/html/"
+          strip_components: 1
 
-         - name: Restart Nginx
+      - name: Restart Nginx
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -156,7 +159,7 @@
           script: |
             sudo systemctl restart nginx
 
-   ```
+```
 
 ## Final Note- Final Verification 📌
    From Frontend VM:
