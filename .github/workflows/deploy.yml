@@ -13,38 +13,34 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install Node
+      - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: "16"
 
+      # ✅ Install dependencies — REQUIRED
       - name: Install Dependencies
         run: npm install
 
       - name: Build Frontend
         run: npm run build
 
-      - name: Zip Build Folder
-        run: zip -r build.zip build/
-
-      - name: Upload build to Azure VM
+      # 🔥 Copy ONLY build folder CONTENTS into /var/www/html/
+      - name: Copy Build Contents to VM
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "build.zip"
-          target: "/var/www/"
+          port: 22
+          source: "build/*"
+          target: "/var/www/html/"
 
-      - name: Deploy on VM
+      - name: Restart Nginx
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd /var/www
-            sudo rm -rf html
-            sudo unzip -o build.zip -d /var/www/
-            sudo mv build html
             sudo systemctl restart nginx

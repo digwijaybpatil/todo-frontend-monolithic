@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Button, TextField, Container, Typography, Grid, Card, CardContent, IconButton } from '@mui/material';
+import { Button, TextField, Container, Typography, Card, CardContent, IconButton } from '@mui/material';
 import { Delete } from '@mui/icons-material';
 import { Box } from '@mui/material';
 
-const API_BASE_URL = 'http://74.225.232.53:8000';
+const API_BASE_URL = 'http://10.10.2.4:8000'; // Backend API URL
 
 const backgroundImage = process.env.PUBLIC_URL + '/background.jpg';
 
