@@ -33,18 +33,20 @@
 
 
 
-2. **⚙️ Configure Backend Private IP in React**
-   - Open the `src/TodoApp.js` file.
-   - Locate the variable storing the backend URL and update it with the appropriate value. (* See Below for PrivateIp Configuration)
-   - Update the Backend URL by replacing the existing line with the following:
+2. **⚙️ Update React API URL**
+   - Open the `src/TodoApp.js` file.   
+   - Update the API base URL by replacing the existing line with the following:
 
    ```javascript
-   const API_BASE_URL = 'http://<BackendVM private IP>:8000'; 
+   const API_BASE_URL = 'http://<FRONTEND_PUBLIC_IP>/api'; 
+
+   const API_BASE_URL = 'http://98.70.110.128/api';
+
    
    ```
 
-   - Replace `<backendVM private IP>` with the actual private IP address of your Backend VM.
-   - This ensures your frontend talks directly to backend using private IP inside Azure VNet.
+   - Replace `<FRONTEND_PUBLIC_IP>` with the actual public IP address of your Frontend VM.
+   - This ensures React must call the frontend VM → not backend directly.
 
 
 3. **🏗️ Install & Build the Frontend**
@@ -58,7 +60,7 @@
      ```
 
 
-4. **🚀 NGINX Setup on Frontend VM**
+4. **🚀 Configure NGINX Reverse Proxy on Frontend VM**
 
    Open the NGINX configuration file:
 
@@ -74,15 +76,23 @@
     listen [::]:80 default_server;
 
     root /var/www/html;
-
     index index.html;
 
     server_name _;
 
+    # Serve React App
     location / {
         try_files $uri $uri/ /index.html;
     }
+
+    # Proxy /api/ requests to backend private IP
+    location /api/ {
+        proxy_pass http://10.10.2.4:8000/; #Replace with your backend URL
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
    }
+
 
    ```
 
